@@ -62,3 +62,7 @@ pnpm test
 Потребуются HTTPS, отдельные production-секреты и БД, резервное копирование, proxy `/api/auth/*` к NestJS и осознанная настройка доверенного proxy/IP для rate limit. На фронтенде существующий PHP-gate закрытых calculator assets пока сохранён; при переходе на Node нужно согласовать его с новой сессией. Текущая локальная проверка использует Vite и не подтверждает серверную защиту статических JS/CSS.
 
 Справочная документация: [NestJS rate limiting](https://docs.nestjs.com/security/rate-limiting), [PostgreSQL](https://www.postgresql.org/docs/17/tutorial.html).
+
+## Ветки и стенды
+
+`dev` — интеграция и dev-стенд; `main` — стабильная production-ветка. Рабочие ветки: `feat/*`, `fix/*`, `chore/*` и другие обычные префиксы. Правила PR, релизов и изоляции данных: [CONTRIBUTING.md](./CONTRIBUTING.md). Развёртывание backend/CMS на сервере ещё не настроено.
