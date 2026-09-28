@@ -22,6 +22,8 @@ import { Transform } from "class-transformer";
 import { IsEmail, IsString, MaxLength, MinLength } from "class-validator";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import type { NestExpressApplication } from "@nestjs/platform-express";
+import { EstimateController, EstimateStore } from "./estimates";
 import type { Request, Response } from "express";
 import { AuthStore, SESSION_MS, type User } from "./auth.store";
 
@@ -155,9 +157,10 @@ class HealthController {
 
 @Module({
   imports: [ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }])],
-  controllers: [AuthController, HealthController],
+  controllers: [AuthController, HealthController, EstimateController],
   providers: [
     AuthStore,
+    EstimateStore,
     { provide: APP_GUARD, useClass: MutationGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
@@ -165,11 +168,13 @@ class HealthController {
 class AppModule {}
 
 export async function createApp() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ["error", "warn", "log"],
+    bodyParser: false,
   });
   app.setGlobalPrefix("api");
   app.use(helmet());
+  app.useBodyParser("json", { limit: "1100kb" });
   app.use(cookieParser());
   app.use((_req: Request, res: Response, next: () => void) => {
     res.setHeader("Cache-Control", "no-store");
@@ -178,7 +183,7 @@ export async function createApp() {
   app.enableCors({
     origin: origins(),
     credentials: true,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "X-Anfas-Client"],
   });
   app.enableShutdownHooks();

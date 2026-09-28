@@ -50,7 +50,7 @@ function digest(token: string): string {
 
 @Injectable()
 export class AuthStore implements OnModuleDestroy, OnModuleInit {
-  private readonly db: Pool;
+  readonly db: Pool;
   private readonly dummy = passwordHash(randomBytes(32).toString("hex"));
 
   constructor() {
@@ -80,6 +80,14 @@ export class AuthStore implements OnModuleDestroy, OnModuleInit {
         expires_at TIMESTAMPTZ NOT NULL
       );
       CREATE INDEX IF NOT EXISTS sessions_expiry ON sessions(expires_at);
+      CREATE TABLE IF NOT EXISTS estimates (
+        id UUID PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title TEXT NOT NULL CHECK (length(title) BETWEEN 1 AND 120), payload JSONB NOT NULL,
+        revision INTEGER NOT NULL DEFAULT 1, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      ALTER TABLE estimates ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN NOT NULL DEFAULT FALSE;
+      CREATE INDEX IF NOT EXISTS estimates_owner_updated ON estimates(user_id, updated_at DESC);
     `);
   }
 
