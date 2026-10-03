@@ -13,7 +13,7 @@
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "start": "node --env-file-if-exists=.env dist/main.js",
-    "test": "node --env-file-if-exists=.env --import tsx --test test/auth.test.ts",
+    "test": "node --env-file-if-exists=.env --import tsx --test test/*.test.ts",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down"
   },
